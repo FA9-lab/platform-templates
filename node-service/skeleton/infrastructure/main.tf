@@ -1,5 +1,3 @@
 locals {
-  service_name    =    var.service_name
+  service_name = var.service_name
 }
-
-resource "deliberately_broken" {
