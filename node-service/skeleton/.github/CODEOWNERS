@@ -1,0 +1,8 @@
+# Default owner for repository content
+* @FA9-lab
+
+# Explicit ownership of CI configuration
+/.github/workflows/ @FA9-lab
+
+# Backstage metadata
+/catalog-info.yaml @FA9-lab

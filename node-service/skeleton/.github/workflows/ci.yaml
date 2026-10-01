@@ -1,0 +1,11 @@
+name: Service CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  service-ci:
+    uses: FA9-lab/platform-workflows/.github/workflows/node-service-ci.yml@main
+    with:
+      node-version: '22'

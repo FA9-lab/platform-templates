@@ -1,0 +1,15 @@
+name: Terraform Plan
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'infrastructure/**'
+
+jobs:
+  terraform-plan:
+    uses: FA9-lab/platform-workflows/.github/workflows/terraform-plan.yml@main
+    with:
+      terraform-version: "1.9.8"
+      working-directory: infrastructure
