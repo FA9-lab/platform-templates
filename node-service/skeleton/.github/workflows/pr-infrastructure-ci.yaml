@@ -1,4 +1,4 @@
-name: Terraform CI
+name: PR Infrastructure CI
 
 on:
   pull_request:

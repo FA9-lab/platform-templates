@@ -1,4 +1,4 @@
-name: Terraform Plan
+name: PR Infrastructure Plan
 
 on:
   pull_request:
