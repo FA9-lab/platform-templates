@@ -1,0 +1,53 @@
+name: Validate Platform Templates
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'node-service/**'
+      - '.github/workflows/validate-templates.yml'
+
+jobs:
+  validate-node-service:
+    name: Validate Node Service Template
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate YAML syntax
+        run: |
+          ruby -e "
+          require 'yaml'
+
+          files = [
+            'node-service/template.yaml',
+            'node-service/skeleton/.github/workflows/ci.yaml',
+            'node-service/skeleton/.github/workflows/pr-infrastructure-ci.yaml',
+            'node-service/skeleton/.github/workflows/pr-infrastructure-plan.yaml'
+          ]
+
+          files.each do |file|
+            YAML.load_file(file)
+            puts \"Valid YAML: #{file}\"
+          end
+          "
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9.8"
+
+      - name: Check Terraform formatting
+        working-directory: node-service/skeleton/infrastructure
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Init
+        working-directory: node-service/skeleton/infrastructure
+        run: terraform init -backend=false -input=false
+
+      - name: Terraform Validate
+        working-directory: node-service/skeleton/infrastructure
+        run: terraform validate
