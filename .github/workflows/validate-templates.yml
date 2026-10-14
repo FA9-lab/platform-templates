@@ -6,7 +6,7 @@ on:
       - main
     paths:
       - 'node-service/**'
-      - '.github/workflows/validate-templates.yml'
+      - '.github/workflows/validate-templates.yaml'
 
 jobs:
   validate-node-service:
