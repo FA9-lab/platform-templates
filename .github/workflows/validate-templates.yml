@@ -34,7 +34,64 @@ jobs:
             puts \"Valid YAML: #{file}\"
           end
           "
+          
+      - name: Validate Backstage template structure
+        run: |
+          ruby <<'RUBY'
+          require 'yaml'
 
+          template = YAML.load_file('node-service/template.yaml')
+
+          abort 'Invalid Backstage API version' unless
+            template['apiVersion'] == 'scaffolder.backstage.io/v1beta3'
+
+          abort 'Invalid Backstage kind' unless
+            template['kind'] == 'Template'
+
+          metadata = template['metadata']
+          abort 'Missing template metadata' unless metadata.is_a?(Hash)
+
+          %w[name title description].each do |field|
+            abort "Missing metadata.#{field}" if metadata[field].to_s.empty?
+          end
+
+          spec = template['spec']
+          abort 'Missing template spec' unless spec.is_a?(Hash)
+
+          %w[owner type].each do |field|
+            abort "Missing spec.#{field}" if spec[field].to_s.empty?
+          end
+
+          steps = spec['steps']
+          abort 'Missing scaffolder steps' unless steps.is_a?(Array) && !steps.empty?
+
+          ids = []
+
+          steps.each do |step|
+            abort 'Invalid scaffolder step' unless step.is_a?(Hash)
+
+            %w[id name action].each do |field|
+              abort "Step missing #{field}" if step[field].to_s.empty?
+            end
+
+            ids << step['id']
+
+            if step['action'] == 'fetch:template'
+              source = step.dig('input', 'url')
+              abort 'Missing fetch:template source' if source.to_s.empty?
+
+              if source.start_with?('./')
+                path = File.expand_path(source, 'node-service')
+                abort "Missing skeleton directory: #{path}" unless Dir.exist?(path)
+              end
+            end
+          end
+
+          abort 'Duplicate scaffolder step IDs' unless ids.uniq.length == ids.length
+
+          puts 'Backstage template structure validated successfully'
+          RUBY
+          
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
