@@ -49,7 +49,7 @@ spec:
       name: Generate Service
       action: fetch:template
       input:
-        url: ./nonexistent-skeleton
+        url: ./skeleton
         values:
           name: ${{ parameters.name }}
           description: ${{ parameters.description }}
